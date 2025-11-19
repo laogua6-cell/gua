@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帖子发布系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .post-form {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .image-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .image-upload input[type="file"] {
+            display: none;
+        }
+        
+        .upload-btn {
+            display: block;
+            padding: 12px 20px;
+            background: #e9ecef;
+            color: #495057;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px dashed #adb5bd;
+            transition: all 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background: #dee2e6;
+            border-color: #6a11cb;
+        }
+        
+        .image-preview {
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .publish-btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+            width: 100%;
+        }
+        
+        .publish-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(38, 117, 252, 0.3);
+        }
+        
+        .search-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #218838;
+        }
+        
+        .posts-section h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #444;
+        }
+        
+        .posts-container {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .post {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #6a11cb;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .post-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .post-date {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .post-content {
+            margin-bottom: 15px;
+            color: #555;
+            white-space: pre-wrap;
+        }
+        
+        .post-image {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .post-image img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 6px;
+        }
+        
+        .empty-posts {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .empty-posts p {
+            margin-bottom: 15px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+        
+        .view-all-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .view-all-btn:hover {
+            background: #545b62;
+        }
+        
+        .collapsed {
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .collapsed::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(transparent, white);
+        }
+        
+        .expand-btn {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+        
+        /* 确认弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .modal-message {
+            margin-bottom: 20px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .modal-confirm {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .modal-confirm:hover {
+            background: #c0392b;
+        }
+        
+        .modal-cancel {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .modal-cancel:hover {
+            background: #7f8c8d;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 确认弹窗 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-title">确认操作</div>
+            <div class="modal-message" id="modalMessage">您确定要清空所有帖子吗？此操作不可撤销！</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" id="modalConfirm">确定</button>
+                <button class="modal-btn modal-cancel" id="modalCancel">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>帖子发布系统</h1>
+            <p class="subtitle">发布您的想法和图片，数据将保存在本地浏览器中</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="post-form">
+                <div class="form-group">
+                    <label for="postTitle">帖子标题</label>
+                    <input type="text" id="postTitle" placeholder="输入帖子标题...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="postContent">帖子内容</label>
+                    <textarea id="postContent" placeholder="输入帖子内容..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>上传图片（可选）</label>
+                    <div class="image-upload">
+                        <label for="postImage" class="upload-btn">
+                            📁 选择图片
+                        </label>
+                        <input type="file" id="postImage" accept="image/*">
+                    </div>
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImg" src="#" alt="图片预览">
+                    </div>
+                </div>
+                
+                <button class="publish-btn" id="publishBtn">发布帖子</button>
+            </div>
+            
+            <div class="posts-section">
+                <h2>已发布的帖子</h2>
+                
+                <div class="search-section">
+                    <input type="text" id="searchInput" class="search-input" placeholder="搜索帖子标题或内容...">
+                    <button class="search-btn" id="searchBtn">搜索</button>
+                </div>
+                
+                <div class="posts-container" id="postsContainer">
+                    <!-- 帖子将动态添加到这里 -->
+                </div>
+                
+                <div class="controls">
+                    <button class="clear-btn" id="clearBtn">清空所有帖子</button>
+                    <button class="view-all-btn" id="viewAllBtn">查看全部帖子</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const postTitle = document.getElementById('postTitle');
+            const postContent = document.getElementById('postContent');
+            const postImage = document.getElementById('postImage');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const publishBtn = document.getElementById('publishBtn');
+            const postsContainer = document.getElementById('postsContainer');
+            const clearBtn = document.getElementById('clearBtn');
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const viewAllBtn = document.getElementById('viewAllBtn');
+            
+            // 弹窗相关元素
+            const confirmModal = document.getElementById('confirmModal');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalConfirm = document.getElementById('modalConfirm');
+            const modalCancel = document.getElementById('modalCancel');
+            
+            // 状态变量
+            let isViewingAll = false;
+            let currentSearchTerm = '';
+            
+            // 图片预览功能
+            postImage.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.addEventListener('load', function() {
+                        previewImg.src = reader.result;
+                        imagePreview.style.display = 'block';
+                    });
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+            
+            // 发布帖子功能
+            publishBtn.addEventListener('click', function() {
+                const title = postTitle.value.trim();
+                const content = postContent.value.trim();
+                const imageFile = postImage.files[0];
+                
+                if (!title || !content) {
+                    alert('请填写标题和内容！');
+                    return;
+                }
+                
+                // 读取现有帖子
+                let posts = JSON.parse(localStorage.getItem('posts')) || [];
+                
+                // 创建新帖子对象
+                const newPost = {
+                    id: Date.now(), // 使用时间戳作为唯一ID
+                    title: title,
+                    content: content,
+                    date: new Date().toLocaleString('zh-CN'),
+                    image: null
+                };
+                
+                // 如果有图片，转换为base64
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        newPost.image = e.target.result;
+                        savePost(newPost, posts);
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    savePost(newPost, posts);
+                }
+            });
+            
+            // 保存帖子到本地存储
+            function savePost(post, posts) {
+                posts.unshift(post); // 新帖子添加到开头
+                localStorage.setItem('posts', JSON.stringify(posts));
+                
+                // 重置表单
+                postTitle.value = '';
+                postContent.value = '';
+                postImage.value = '';
+                imagePreview.style.display = 'none';
+                
+                // 刷新帖子列表
+                displayPosts();
+            }
+            
+            // 显示帖子列表
+            function displayPosts() {
+                let posts = JSON.parse(localStorage.getItem('posts')) || [];
+                
+                // 应用搜索过滤
+                if (currentSearchTerm) {
+                    const searchTerm = currentSearchTerm.toLowerCase();
+                    posts = posts.filter(post => 
+                        post.title.toLowerCase().includes(searchTerm) || 
+                        post.content.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // 限制显示数量（如果不是查看全部模式）
+                const displayPosts = isViewingAll ? posts : posts.slice(0, 3);
+                
+                postsContainer.innerHTML = '';
+                
+                if (posts.length === 0) {
+                    const emptyMessage = currentSearchTerm ? 
+                        '没有找到匹配的帖子' : '还没有发布任何帖子';
+                    postsContainer.innerHTML = `
+                        <div class="empty-posts">
+                            <p>${emptyMessage}</p>
+                            <p>${currentSearchTerm ? '尝试其他搜索词' : '发布您的第一个帖子吧！'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                displayPosts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <div class="post-header">
+                            <div class="post-title">${escapeHtml(post.title)}</div>
+                            <div class="post-date">${post.date}</div>
+                        </div>
+                        <div class="post-content collapsed">${escapeHtml(post.content)}</div>
+                        ${post.image ? `<div class="post-image"><img src="${post.image}" alt="帖子图片"></div>` : ''}
+                        <button class="expand-btn" onclick="toggleExpand(this)">展开内容</button>
+                    `;
+                    postsContainer.appendChild(postElement);
+                });
+                
+                // 更新查看全部按钮文本
+                viewAllBtn.textContent = isViewingAll ? '收起帖子' : `查看全部帖子 (${posts.length})`;
+            }
+            
+            // 切换帖子内容展开/收起
+            window.toggleExpand = function(button) {
+                const postContent = button.previousElementSibling;
+                if (postContent.classList.contains('collapsed')) {
+                    postContent.classList.remove('collapsed');
+                    button.textContent = '收起内容';
+                } else {
+                    postContent.classList.add('collapsed');
+                    button.textContent = '展开内容';
+                }
+            };
+            
+            // 显示确认弹窗
+            function showConfirmModal(message, confirmCallback) {
+                modalMessage.textContent = message;
+                confirmModal.style.display = 'flex';
+                
+                // 移除之前的事件监听器
+                modalConfirm.onclick = null;
+                modalCancel.onclick = null;
+                
+                // 确认按钮事件
+                modalConfirm.onclick = function() {
+                    confirmModal.style.display = 'none';
+                    confirmCallback();
+                };
+                
+                // 取消按钮事件
+                modalCancel.onclick = function() {
+                    confirmModal.style.display = 'none';
+                };
+                
+                // 点击模态框外部关闭
+                confirmModal.onclick = function(e) {
+                    if (e.target === confirmModal) {
+                        confirmModal.style.display = 'none';
+                    }
+                };
+            }
+            
+            // 清空所有帖子（带确认弹窗）
+            clearBtn.addEventListener('click', function() {
+                const posts = JSON.parse(localStorage.getItem('posts')) || [];
+                if (posts.length === 0) {
+                    alert('当前没有帖子可清空！');
+                    return;
+                }
+                
+                showConfirmModal('您确定要清空所有帖子吗？此操作不可撤销！', function() {
+                    localStorage.removeItem('posts');
+                    isViewingAll = false;
+                    currentSearchTerm = '';
+                    searchInput.value = '';
+                    displayPosts();
+                });
+            });
+            
+            // 搜索帖子
+            searchBtn.addEventListener('click', function() {
+                currentSearchTerm = searchInput.value.trim();
+                isViewingAll = true; // 搜索时自动显示所有匹配结果
+                displayPosts();
+            });
+            
+            // 按回车键搜索
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    currentSearchTerm = searchInput.value.trim();
+                    isViewingAll = true;
+                    displayPosts();
+                }
+            });
+            
+            // 查看全部/收起帖子
+            viewAllBtn.addEventListener('click', function() {
+                isViewingAll = !isViewingAll;
+                displayPosts();
+            });
+            
+            // 防止XSS攻击的简单转义函数
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            // 初始化显示帖子
+            displayPosts();
+        });
+    </script>
+</body>
+</html>
